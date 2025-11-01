@@ -1,0 +1,1 @@
+# Lógica del juego se implementará en futuras entregas.
