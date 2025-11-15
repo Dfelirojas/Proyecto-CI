@@ -6,13 +6,20 @@ pipeline {
         stage('Clonar repositorio') {
             steps {
                 git branch: 'main',
-                    url: 'https://github.com/Dfelirojas/Proyecto-CI.git'
+                    url: 'https://github.com/Dfelirojas/Proyecto-CI.git',
+                    credentialsId: '89b690d6-5a8b-4c2a-890e-7d0be95f8b77'
             }
         }
 
         stage('Construir contenedores Docker') {
             steps {
                 bat 'docker compose build'
+            }
+        }
+
+        stage('Levantar contenedores') {
+            steps {
+                bat 'docker compose up -d'
             }
         }
 
@@ -38,5 +45,6 @@ pipeline {
         }
     }
 }
+
 
 
