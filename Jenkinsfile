@@ -11,47 +11,41 @@ pipeline {
             }
         }
 
-        stage('Construir contenedores Docker') {
+        stage('Construir imágenes Docker') {
             steps {
                 bat 'docker compose build'
             }
         }
 
-        stage('Levantar contenedores (pruebas)') {
+        stage('Ejecutar pruebas') {
             steps {
-                bat 'docker compose up -d --build --force-recreate'
+                bat 'docker compose up --build --exit-code-from backend --abort-on-container-exit'
             }
         }
 
-        stage('Ejecutar Pruebas') { 
-            steps {
-                bat 'docker compose run --rm backend python -m unittest discover'
-            }
-        }
-
-        stage('Destruir contenedores anteriores y reconstruir para despliegue') {
+        stage('Limpiar contenedores de pruebas') {
             steps {
                 bat 'docker compose down --remove-orphans'
-                bat 'docker compose up -d --build'
             }
         }
 
-        stage('Desplegar') {
+        stage('Desplegar entorno final') {
             steps {
-                echo "Despliegue finalizado y contenedores funcionando."
+                bat 'docker compose up -d --build'
+                echo "Despliegue completado exitosamente 🚀"
             }
         }
     }
 
     post {
         success {
-            echo "Pipeline ejecutado correctamente."
+            echo "Pipeline ejecutado correctamente 😎"
         }
         failure {
-            echo "Error en el pipeline."
-            // Opcional: limpieza automática en caso de fallo
+            echo "Error detectado, limpiar contenedores"
             bat 'docker compose down --remove-orphans'
         }
     }
 }
+
 
