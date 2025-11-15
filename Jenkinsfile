@@ -17,9 +17,15 @@ pipeline {
             }
         }
 
+        stage('Detener contenedores previos') {
+            steps {
+                bat 'docker compose down --remove-orphans'
+            }
+        }
+
         stage('Levantar contenedores') {
             steps {
-                bat 'docker compose up -d'
+                bat 'docker compose up -d --build'
             }
         }
 
@@ -45,6 +51,3 @@ pipeline {
         }
     }
 }
-
-
-
