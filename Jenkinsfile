@@ -17,15 +17,9 @@ pipeline {
             }
         }
 
-        stage('Detener contenedores previos') {
+        stage('Levantar contenedores (pruebas)') {
             steps {
-                bat 'docker compose down --remove-orphans'
-            }
-        }
-
-        stage('Levantar contenedores') {
-            steps {
-                bat 'docker compose up -d --build'
+                bat 'docker compose up -d --build --force-recreate'
             }
         }
 
@@ -35,9 +29,16 @@ pipeline {
             }
         }
 
+        stage('Destruir contenedores anteriores y reconstruir para despliegue') {
+            steps {
+                bat 'docker compose down --remove-orphans'
+                bat 'docker compose up -d --build'
+            }
+        }
+
         stage('Desplegar') {
             steps {
-                bat 'docker compose up -d'
+                echo "Despliegue finalizado y contenedores funcionando."
             }
         }
     }
@@ -48,6 +49,9 @@ pipeline {
         }
         failure {
             echo "Error en el pipeline."
+            // Opcional: limpieza automática en caso de fallo
+            bat 'docker compose down --remove-orphans'
         }
     }
 }
+
