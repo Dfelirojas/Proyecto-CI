@@ -5,6 +5,7 @@ pipeline {
 
         stage('Clonar repositorio') {
             steps {
+                echo "Clonando repositorio..."
                 git branch: 'main',
                     url: 'https://github.com/Dfelirojas/Proyecto-CI.git'
             }
@@ -12,44 +13,51 @@ pipeline {
 
         stage('Construir contenedores') {
             steps {
+                echo "Construyendo contenedores Docker..."
+                
                 bat 'docker compose build'
             }
         }
 
         stage('Ejecutar pruebas + coverage') {
             steps {
-                // 1. Ejecuta el script de pruebas usando la ruta absoluta verificada: /app/Backend/tests/run_tests.py
-                bat 'docker compose run --rm backend sh -c "PYTHONPATH=/app/Backend python -m coverage run --source=/app/Backend /app/Backend/tests/run_tests.py"'
-
-                // 2. Genera el archivo coverage.xml. (Se debe generar en el directorio del código fuente)
-                bat 'docker compose run --rm backend sh -c "cd /app/Backend && coverage xml -o coverage.xml"'
+                echo "Ejecutando pruebas y generando reporte de cobertura..."
+              
+                bat 'docker compose run --rm backend sh -c "cd /app/Backend && PYTHONPATH=. python -m coverage run --source=. run_tests.py && coverage xml -o coverage.xml"'
             }
         }
 
         stage('Enviar a Codecov') {
             steps {
-                // Comando para el uploader de Codecov en Windows
+                echo "Enviando reporte de cobertura a Codecov..."
+                // Descarga y ejecuta el uploader.
                 bat '''
                     curl -Os https://uploader.codecov.io/latest/windows/codecov.exe
-                    codecov.exe -f coverage.xml
+                    codecov.exe -f Backend/coverage.xml
                 '''
             }
         }
 
         stage('Desplegar entorno final') {
             steps {
+                echo "Desplegando la aplicación con Docker Compose..."
                 bat 'docker compose up -d --build'
             }
         }
     }
 
     post {
-        
+        always {
+            // Limpia los contenedores en caso de fallo, pero los mantiene si el despliegue es exitoso (stage final)
+            // Se usa 'if (currentBuild.result == 'FAILURE')' para asegurar que el 'up -d' del final no sea interrumpido.
+            cleanWs()
+        }
         success {
-            echo "Pipeline ejecutado correctamente."
+            echo "Pipeline ejecutado correctamente. Aplicación desplegada."
         }
         failure {
-            echo "Error en el pipeline."
+            echo "Error en el pipeline. Deteniendo contenedores."
+            // Detiene y elimina los contenedores creados si hay un fallo
             bat 'docker compose down --remove-orphans'
         }
     }
