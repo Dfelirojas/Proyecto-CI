@@ -1,19 +1,12 @@
 pipeline {
     agent any
 
-    environment {
-        CODECOV_TOKEN = credentials('codecov-token')   // ID del token en Jenkins
-    }
-
     stages {
 
         stage('Clonar repositorio') {
             steps {
-                git(
-                    url: 'https://github.com/Dfelirojas/Proyecto-CI.git',
-                    branch: 'main',
-                    credentialsId: '89b690d6-5a8b-4c2a-890e-7d0be95f8b77'
-                )
+                git branch: 'main',
+                    url: 'https://github.com/Dfelirojas/Proyecto-CI.git'
             }
         }
 
@@ -25,51 +18,41 @@ pipeline {
 
         stage('Ejecutar pruebas + coverage') {
             steps {
-                // IMPORTANTE: moverse a Backend dentro del contenedor
-                bat '''
-                docker compose run --rm backend sh -c "cd Backend && \
-                    coverage run -m unittest discover -s tests -p 'test_*.py'"
-                '''
+                // Ejecuta pruebas con coverage dentro del contenedor backend
+                bat 'docker compose run --rm backend coverage run -m unittest discover -s tests -p "test_*.py"'
 
-                bat '''
-                docker compose run --rm backend sh -c "cd Backend && \
-                    coverage xml -o coverage.xml"
-                '''
-            }
-            post {
-                always {
-                    archiveArtifacts artifacts: 'Backend/coverage.xml', allowEmptyArchive: true
-                }
+                // Genera el archivo coverage.xml
+                bat 'docker compose run --rm backend coverage xml -o coverage.xml'
+
+                // Copia coverage.xml al workspace de Jenkins
+                // El nombre del contenedor puede variar, ajusta si es necesario
+                bat 'docker cp juego_backend:/app/coverage.xml coverage.xml'
             }
         }
 
-        stage('Enviar cobertura a Codecov') {
-            when {
-                expression { fileExists('Backend/coverage.xml') }
-            }
+        stage('Enviar a Codecov') {
             steps {
                 bat '''
-                curl -Os https://uploader.codecov.io/latest/windows/codecov.exe
-                codecov.exe -t %CODECOV_TOKEN% -f Backend/coverage.xml
+                    curl -Os https://uploader.codecov.io/latest/windows/codecov.exe
+                    codecov.exe -f coverage.xml
                 '''
             }
         }
 
         stage('Desplegar entorno final') {
             steps {
-                echo "Desplegando aplicación final..."
-                bat 'docker compose up -d'
+                bat 'docker compose up -d --build'
             }
         }
     }
 
     post {
+        success {
+            echo "✔ Pipeline ejecutado correctamente."
+        }
         failure {
             echo "Error en el pipeline."
             bat 'docker compose down --remove-orphans'
-        }
-        success {
-            echo "Pipeline ejecutado correctamente."
         }
     }
 }
