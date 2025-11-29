@@ -30,14 +30,12 @@ pipeline {
             }
         }
 
-        stage('Enviar a Codecov') {
+        stage('Enviar cobertura a Codecov') {
             steps {
-                withCredentials([string(credentialsId: 'codecov-token', variable: 'CODECOV_TOKEN')]) {
-                    bat '''
-                        curl -Os https://uploader.codecov.io/latest/windows/codecov.exe
-                        codecov.exe -t %CODECOV_TOKEN% -f coverage.xml
-                    '''
-                }
+                bat '''
+                    curl -Os https://uploader.codecov.io/latest/windows/codecov.exe
+                    codecov.exe -f coverage.xml
+                '''
             }
         }
 
