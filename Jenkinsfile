@@ -19,7 +19,7 @@ pipeline {
         stage('Ejecutar pruebas + coverage') {
             steps {
                 // Ejecuta pruebas con coverage dentro del contenedor backend
-                bat 'docker compose run --rm backend coverage run -m unittest discover -s tests -p "test_*.py"'
+                bat 'docker compose run --rm backend coverage run --source=/app -m unittest discover -s tests -p "test_*.py"'
 
                 // Genera el archivo coverage.xml
                 bat 'docker compose run --rm backend coverage xml -o coverage.xml'
