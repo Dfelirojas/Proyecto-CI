@@ -27,14 +27,11 @@ pipeline {
             }
         }
 
-        stage('Enviar a Codecov') {
+        stage('Ejecutar pruebas + coverage') {
             steps {
-                echo "Enviando reporte de cobertura a Codecov..."
-                // Descarga y ejecuta el uploader.
-                bat '''
-                    curl -Os https://uploader.codecov.io/latest/windows/codecov.exe
-                    codecov.exe -f Backend/coverage.xml
-                '''
+                echo "Ejecutando pruebas y generando reporte de cobertura..."
+                
+                bat 'docker compose run --rm --user 0 backend sh -c "cd /app/Backend && PYTHONPATH=. python -m coverage run --source=. --data-file=.coverage.ci tests/run_tests.py && coverage xml -o /tmp/coverage.xml --data-file=.coverage.ci && mv /tmp/coverage.xml ."'
             }
         }
 
