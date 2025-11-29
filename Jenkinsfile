@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     stages {
-
         stage('Clonar repositorio') {
             steps {
                 echo "Clonando repositorio..."
@@ -14,7 +13,6 @@ pipeline {
         stage('Construir contenedores') {
             steps {
                 echo "Construyendo contenedores Docker..."
-                
                 bat 'docker compose build'
             }
         }
@@ -22,11 +20,10 @@ pipeline {
         stage('Ejecutar pruebas + coverage') {
             steps {
                 echo "Ejecutando pruebas y generando reporte de cobertura..."
-               
-                bat 'docker compose run --rm --user 0 backend sh -c "cd /app/Backend && PYTHONPATH=. python -m coverage run --source=. --data-file=.coverage.ci tests/run_tests.py && coverage xml -o /app/Backend/coverage.xml --data-file=.coverage.ci"'
+              
+                bat 'docker compose run --rm --user 0 backend sh -c "cd /app/Backend && PYTHONPATH=. python -m coverage run --source=. --data-file=.coverage.ci tests/run_tests.py && coverage xml -o /tmp/coverage.xml --data-file=.coverage.ci && mv /tmp/coverage.xml ."'
             }
         }
-        
         stage('Desplegar entorno final') {
             steps {
                 echo "Desplegando la aplicación con Docker Compose..."
@@ -37,8 +34,6 @@ pipeline {
 
     post {
         always {
-            // Limpia los contenedores en caso de fallo, pero los mantiene si el despliegue es exitoso (stage final)
-            // Se usa 'if (currentBuild.result == 'FAILURE')' para asegurar que el 'up -d' del final no sea interrumpido.
             cleanWs()
         }
         success {
