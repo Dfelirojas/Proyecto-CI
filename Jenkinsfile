@@ -25,8 +25,7 @@ pipeline {
                 bat 'docker compose run --rm backend coverage xml -o coverage.xml'
 
                 // Copia coverage.xml al workspace de Jenkins
-                // El nombre del contenedor puede variar, ajusta si es necesario
-                bat 'docker cp juego_backend:/app/coverage.xml coverage.xml'
+                bat 'docker cp backend:/app/coverage.xml coverage.xml'
             }
         }
 
@@ -48,7 +47,7 @@ pipeline {
 
     post {
         success {
-            echo "Pipeline ejecutado correctamente."
+            echo "✔ Pipeline ejecutado correctamente."
         }
         failure {
             echo "Error en el pipeline."
