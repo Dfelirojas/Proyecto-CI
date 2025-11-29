@@ -1,10 +1,19 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
-    color: #333;
+    font-family: Arial;
     text-align: center;
-    margin-top: 20%;
+    background-color: #f4f4f9;
 }
-h1 {
-    color: #2a7ae2;
+#tablero {
+    display: inline-block;
+    margin-top: 20px;
+}
+.fila {
+    display: flex;
+    justify-content: center;
+}
+button {
+    width: 60px;
+    height: 60px;
+    margin: 4px;
+    font-size: 18px;
 }
