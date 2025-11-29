@@ -22,8 +22,8 @@ pipeline {
      stage('Ejecutar pruebas + coverage') {
             steps {
                 echo "Ejecutando pruebas y generando reporte de cobertura..."
-             
-                bat 'docker compose run --rm --user 0 backend sh -c "cd /app/Backend && rm -f .coverage && PYTHONPATH=. python -m coverage run --source=. tests/run_tests.py && coverage xml -o coverage.xml"'
+                
+                bat 'docker compose run --rm --user 0 backend sh -c "cd /app/Backend && PYTHONPATH=. python -m coverage run --source=. --data-file=.coverage.ci tests/run_tests.py && coverage xml -o coverage.xml --data-file=.coverage.ci"'
             }
         }
 
