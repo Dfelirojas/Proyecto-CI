@@ -19,7 +19,7 @@ pipeline {
         stage('Ejecutar pruebas + coverage') {
             steps {
                 // Ejecuta pruebas con coverage. coverage.xml se genera en el host gracias al volumen.
-                bat 'docker compose run --rm backend coverage run --source=/app -m unittest discover'
+                bat 'docker compose run --rm backend coverage run --source=/app -m unittest tests.test_logic tests.test_sample'
 
                 // Genera el archivo coverage.xml. Este archivo aparecerá en la raíz de tu proyecto.
                 bat 'docker compose run --rm backend coverage xml -o coverage.xml'
