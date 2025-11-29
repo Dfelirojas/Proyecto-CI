@@ -1,7 +1,7 @@
 services:
   backend:
     build:
-      context: ./Backend
+      context: ./backend
     ports:
       - "5000:5000"
     networks:
