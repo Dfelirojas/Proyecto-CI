@@ -1,10 +1,5 @@
 import unittest
 
-class TestSample(unittest.TestCase):
-    def test_basic(self):
-        self.assertEqual(1 + 1, 2)
-import unittest
-
-class TestSample(unittest.TestCase):
-    def test_basic(self):
-        self.assertEqual(1 + 1, 2)
+class TestBasic(unittest.TestCase):
+    def test_math(self):
+        self.assertEqual(2 + 2, 4)
