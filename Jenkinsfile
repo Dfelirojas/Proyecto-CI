@@ -22,8 +22,9 @@ pipeline {
         stage('Ejecutar pruebas + coverage') {
             steps {
                 echo "Ejecutando pruebas y generando reporte de cobertura..."
-              
-                bat 'docker compose run --rm backend sh -c "cd /app/Backend && PYTHONPATH=. python -m coverage run --source=. run_tests.py && coverage xml -o coverage.xml"'
+                // ÚLTIMA CORRECCIÓN: Ejecutar el script desde la ruta relativa 'tests/run_tests.py'
+                // después de ejecutar 'cd /app/Backend'.
+                bat 'docker compose run --rm backend sh -c "cd /app/Backend && PYTHONPATH=. python -m coverage run --source=. tests/run_tests.py && coverage xml -o coverage.xml"'
             }
         }
 
