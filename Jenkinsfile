@@ -23,8 +23,6 @@ pipeline {
 
                 // Genera el archivo coverage.xml. Este archivo aparecerá en la raíz de tu proyecto.
                 bat 'docker compose run --rm backend coverage xml -o coverage.xml'
-
-                // ¡Ya no se necesita el docker cp! El archivo ya está en el workspace.
             }
         }
 
