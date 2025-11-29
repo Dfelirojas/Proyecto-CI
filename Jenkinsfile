@@ -26,15 +26,7 @@ pipeline {
                 bat 'docker compose run --rm --user 0 backend sh -c "cd /app/Backend && PYTHONPATH=. python -m coverage run --source=. --data-file=.coverage.ci tests/run_tests.py && coverage xml -o /app/Backend/coverage.xml --data-file=.coverage.ci"'
             }
         }
-
-        stage('Ejecutar pruebas + coverage') {
-            steps {
-                echo "Ejecutando pruebas y generando reporte de cobertura..."
-                
-                bat 'docker compose run --rm --user 0 backend sh -c "cd /app/Backend && PYTHONPATH=. python -m coverage run --source=. --data-file=.coverage.ci tests/run_tests.py && coverage xml -o /tmp/coverage.xml --data-file=.coverage.ci && mv /tmp/coverage.xml ."'
-            }
-        }
-
+        
         stage('Desplegar entorno final') {
             steps {
                 echo "Desplegando la aplicación con Docker Compose..."
