@@ -18,17 +18,17 @@ pipeline {
 
         stage('Ejecutar pruebas + coverage') {
             steps {
-                // Ejecuta pruebas con coverage. coverage.xml se genera en el host gracias al volumen.
-              bat 'docker compose run --rm backend coverage run --source=/app python run_tests.py'
+                // 1. Ejecuta el script de pruebas usando la ruta absoluta verificada: /app/Backend/tests/run_tests.py
+                bat 'docker compose run --rm backend sh -c "PYTHONPATH=/app/Backend python -m coverage run --source=/app/Backend /app/Backend/tests/run_tests.py"'
 
-                // Genera el archivo coverage.xml. Este archivo aparecerá en la raíz de tu proyecto.
-                bat 'docker compose run --rm backend coverage xml -o coverage.xml'
+                // 2. Genera el archivo coverage.xml. (Se debe generar en el directorio del código fuente)
+                bat 'docker compose run --rm backend sh -c "cd /app/Backend && coverage xml -o coverage.xml"'
             }
         }
 
         stage('Enviar a Codecov') {
             steps {
-                // Comando correcto para el uploader de Codecov en Windows (como ya lo tenías)
+                // Comando para el uploader de Codecov en Windows
                 bat '''
                     curl -Os https://uploader.codecov.io/latest/windows/codecov.exe
                     codecov.exe -f coverage.xml
@@ -44,7 +44,7 @@ pipeline {
     }
 
     post {
-        // ... (El post se mantiene igual)
+        
         success {
             echo "Pipeline ejecutado correctamente."
         }
