@@ -1,5 +1,7 @@
 import unittest
+from logic import add
 
 class TestBasic(unittest.TestCase):
-    def test_math(self):
-        self.assertEqual(2 + 2, 4)
+    def test_add(self):
+        result = add(2, 2)
+        self.assertEqual(result, 4)
