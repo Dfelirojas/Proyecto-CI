@@ -1,15 +1,17 @@
 services:
   backend:
     build:
-      context: ./backend
+      context: ./Backend
     ports:
       - "5000:5000"
     networks:
       - juego_net
+    volumes: 
+      - .:/app 
 
   frontend:
     build:
-      context: ./frontend
+      context: ./Frontend
     ports:
       - "8081:80"
     depends_on:

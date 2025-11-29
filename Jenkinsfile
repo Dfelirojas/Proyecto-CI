@@ -18,19 +18,19 @@ pipeline {
 
         stage('Ejecutar pruebas + coverage') {
             steps {
-                // Ejecuta pruebas con coverage dentro del contenedor backend
+                // Ejecuta pruebas con coverage. coverage.xml se genera en el host gracias al volumen.
                 bat 'docker compose run --rm backend coverage run --source=/app -m unittest discover -s tests -p "test_*.py"'
 
-                // Genera el archivo coverage.xml
+                // Genera el archivo coverage.xml. Este archivo aparecerá en la raíz de tu proyecto.
                 bat 'docker compose run --rm backend coverage xml -o coverage.xml'
 
-                // Copia coverage.xml al workspace de Jenkins
-                bat 'docker cp backend:/app/coverage.xml coverage.xml'
+                // ¡Ya no se necesita el docker cp! El archivo ya está en el workspace.
             }
         }
 
         stage('Enviar a Codecov') {
             steps {
+                // Comando correcto para el uploader de Codecov en Windows (como ya lo tenías)
                 bat '''
                     curl -Os https://uploader.codecov.io/latest/windows/codecov.exe
                     codecov.exe -f coverage.xml
@@ -46,6 +46,7 @@ pipeline {
     }
 
     post {
+        // ... (El post se mantiene igual)
         success {
             echo "Pipeline ejecutado correctamente."
         }
