@@ -24,7 +24,7 @@ pipeline {
                 bat 'docker compose run --rm --user 0 backend sh -c "cd /app/Backend && PYTHONPATH=. python -m coverage run --source=. --data-file=.coverage-data tests/run_tests.py && coverage xml -o /tmp/coverage.xml --data-file=.coverage-data && cp /tmp/coverage.xml .coverage-report.xml"'
 
                 echo "Copiando reporte de cobertura del contenedor al workspace del Host..." 
-                bat 'FOR /F %%i IN (`docker compose ps -q backend`) DO docker cp %%i:/app/Backend/.coverage-report.xml .'
+                bat 'FOR /F %%i IN ("docker compose ps -q backend") DO docker cp %%i:/app/Backend/.coverage-report.xml .'
                 
                 echo "Subiendo reporte a Codecov de forma segura..."
                 // 2. Inyecta la credencial secreta CODECOV_TOKEN_ID en la variable de entorno CODECOV_TOKEN
