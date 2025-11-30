@@ -20,8 +20,18 @@ pipeline {
        stage('Ejecutar pruebas + coverage') {
             steps {
                 echo "Ejecutando pruebas y generando reporte de cobertura..."
-                
+                // 1. Ejecuta pruebas, genera datos en .coverage-data y copia el reporte XML a .coverage-report.xml
                 bat 'docker compose run --rm --user 0 backend sh -c "cd /app/Backend && PYTHONPATH=. python -m coverage run --source=. --data-file=.coverage-data tests/run_tests.py && coverage xml -o /tmp/coverage.xml --data-file=.coverage-data && cp /tmp/coverage.xml .coverage-report.xml"'
+
+                echo "Subiendo reporte a Codecov de forma segura..."
+                // 2. Inyecta la credencial secreta CODECOV_TOKEN_ID en la variable de entorno CODECOV_TOKEN
+                withCredentials([string(credentialsId: 'CODECOV_TOKEN_ID', variable: 'CODECOV_TOKEN')]) {
+                    // 3. Descarga el uploader de Codecov para Windows
+                    bat 'curl -Os https://uploader.codecov.io/latest/codecov.exe'
+                
+                    // 4. Sube el reporte. El -t %CODECOV_TOKEN% usa el token inyectado de forma segura.
+                    bat 'codecov.exe -t %CODECOV_TOKEN% -f .coverage-report.xml'
+                }
             }
         }
         
