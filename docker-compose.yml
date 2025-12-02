@@ -6,8 +6,8 @@ services:
       - "5000:5000"
     networks:
       - juego_net
-    volumes: 
-      - .:/app 
+    volumes:
+      - ./Backend:/app
 
   frontend:
     build:
